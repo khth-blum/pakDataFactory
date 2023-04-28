@@ -1,0 +1,10 @@
+{
+	"name": "kvdataplatform",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://kvdataplatformprodwe.vault.azure.net/"
+		}
+	}
+}
