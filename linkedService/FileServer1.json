@@ -16,7 +16,7 @@
 			}
 		},
 		"connectVia": {
-			"referenceName": "LinkedIntegrationRuntimeDLIR901",
+			"referenceName": "SHIR-DLIR901-LINKED",
 			"type": "IntegrationRuntimeReference"
 		}
 	}
