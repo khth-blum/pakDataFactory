@@ -1,0 +1,21 @@
+{
+	"name": "Data_TEST_PAK_Sink_OnPrem",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_pak_dfs_test",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "TEST_PAK"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"fileName": "@{dataset().fileName}",
+				"folderPath": "inputStep"
+			}
+		}
+	}
+}
