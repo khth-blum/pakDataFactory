@@ -1,0 +1,19 @@
+{
+	"name": "FileServer1",
+	"properties": {
+		"annotations": [],
+		"type": "FileServer",
+		"typeProperties": {
+			"host": "\\\\net.blum\\dfs\\SYS\\DataPlatform\\PROD_PAK",
+			"userId": "BAULAN\\DataPlatformIntegrat",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "kvdataplatform",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "OnPremDataPlatformIntegration"
+			}
+		}
+	}
+}
