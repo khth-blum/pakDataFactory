@@ -1,0 +1,9 @@
+{
+	"name": "df-pak-prod-westeurope",
+	"location": "westeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "1c04c8d7-fa3f-4dec-b1a9-9c0233940508",
+		"tenantId": "8589a678-2713-47f3-b985-ea77d248aba8"
+	}
+}
