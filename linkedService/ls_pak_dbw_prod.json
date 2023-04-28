@@ -1,0 +1,20 @@
+{
+	"name": "ls_pak_dbw_prod",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-843571675270107.7.azuredatabricks.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/50888be5-ad58-4821-afeb-b8114fdb5353/resourceGroups/rg-pak-prod-westeurope/providers/Microsoft.Databricks/workspaces/dbs-pak-prod-westeurope",
+			"newClusterNodeType": "Standard_DS3_v2",
+			"newClusterNumOfWorker": "1",
+			"newClusterSparkEnvVars": {
+				"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+			},
+			"newClusterVersion": "11.3.x-scala2.12",
+			"newClusterInitScripts": [],
+			"clusterOption": "Fixed"
+		}
+	}
+}
