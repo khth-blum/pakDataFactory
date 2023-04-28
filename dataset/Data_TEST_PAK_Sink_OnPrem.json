@@ -5,6 +5,11 @@
 			"referenceName": "ls_pak_dfs_test",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"fileName": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "TEST_PAK"
 		},
@@ -13,7 +18,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "FileServerLocation",
-				"fileName": "@{dataset().fileName}",
+				"fileName": {
+					"value": "@{dataset().fileName}",
+					"type": "Expression"
+				},
 				"folderPath": "inputStep"
 			}
 		}
