@@ -1,0 +1,29 @@
+{
+	"name": "Data_PROD_PAK_Sink_OnPrem",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_pak_dfs_prod",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"fileName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "PROD_PAK"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"fileName": {
+					"value": "@{dataset().fileName}",
+					"type": "Expression"
+				},
+				"folderPath": "inputStep"
+			}
+		}
+	}
+}
