@@ -1,0 +1,23 @@
+{
+	"name": "ls_pak_dfs_test",
+	"properties": {
+		"annotations": [],
+		"type": "FileServer",
+		"typeProperties": {
+			"host": "\\\\net.blum\\dfs\\SYS\\DataPlatform\\TEST_PAK",
+			"userId": "BAULAN\\DataplatformIntegrat",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "kvdataplatform",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "OnPremDataPlatformIntegration"
+			}
+		},
+		"connectVia": {
+			"referenceName": "SHIR-DLIR901-LINKED",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
