@@ -1,0 +1,55 @@
+{
+	"name": "trigger_test_pak_databricks_workflow",
+	"properties": {
+		"activities": [
+			{
+				"name": "trigger_test_pak_databricks_workflow",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/thomas.kohler@blum.com/PAK_TEST",
+					"baseParameters": {
+						"idempotency_token": {
+							"value": "@{pipeline().RunId}",
+							"type": "Expression"
+						},
+						"basepath": {
+							"value": "@{pipeline().parameters.basePath}",
+							"type": "Expression"
+						},
+						"folderpath": {
+							"value": "@{pipeline().parameters.folderPath}",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dbw_prod",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"basePath": {
+				"type": "string",
+				"defaultValue": "prod"
+			},
+			"folderPath": {
+				"type": "string",
+				"defaultValue": "prod"
+			}
+		},
+		"folder": {
+			"name": "TEST/subpipelines"
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,79 @@
+{
+	"name": "copy_TEST_PAK_Azure_to_onPrem",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "FileServerWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "Data_PROD_PAK_Source_Azure",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": {
+								"value": "@{pipeline().parameters.fileName}",
+								"type": "Expression"
+							},
+							"folderPath": {
+								"value": "@{pipeline().parameters.folderPath}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Data_PROD_PAK_Sink_OnPrem",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": {
+								"value": "@{pipeline().parameters.fileName}",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"fileName": {
+				"type": "string"
+			},
+			"folderPath": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "TEST"
+		},
+		"annotations": []
+	}
+}

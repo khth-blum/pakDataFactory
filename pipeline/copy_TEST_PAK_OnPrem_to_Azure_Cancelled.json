@@ -1,0 +1,44 @@
+{
+	"name": "copy_TEST_PAK_OnPrem_to_Azure_Cancelled",
+	"properties": {
+		"activities": [
+			{
+				"name": "copy_TEST_PAK_OnPrem_to_Azure",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "copy_TEST_PAK_OnPrem_to_Azure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"subFolder": {
+							"value": "@{pipeline().parameters.subFolder}",
+							"type": "Expression"
+						},
+						"basePath": {
+							"value": "@{pipeline().parameters.basePath}",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"subFolder": {
+				"type": "string",
+				"defaultValue": "Cancelled"
+			},
+			"basePath": {
+				"type": "string",
+				"defaultValue": "/Users/thomas.kohler@blum.com/PAK_TEST"
+			}
+		},
+		"folder": {
+			"name": "TEST"
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,309 @@
+{
+	"name": "copy_TEST_PAK_OnPrem_to_Azure",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Metadata outputLake",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "Data_PROD_PAK_Source_OnPrem",
+						"type": "DatasetReference",
+						"parameters": {
+							"subFolder": {
+								"value": "@{pipeline().parameters.subFolder}",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "FileServerReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "BinaryReadSettings"
+					}
+				}
+			},
+			{
+				"name": "Filter Folders",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata outputLake",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Metadata outputLake').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@equals(item().type, 'Folder')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEach Folder",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter Folders",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Filter Folders').output.Value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Get Metadata Folder",
+							"type": "GetMetadata",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "Data_PROD_PAK_Source_OnPrem",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderPath": {
+											"value": "@item().name",
+											"type": "Expression"
+										},
+										"subFolder": {
+											"value": "@{pipeline().parameters.subFolder}",
+											"type": "Expression"
+										}
+									}
+								},
+								"fieldList": [
+									"childItems",
+									"itemName"
+								],
+								"storeSettings": {
+									"type": "FileServerReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							}
+						},
+						{
+							"name": "If Metadata is complete",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "Get Metadata Folder",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@contains(\n    activity('Get Metadata Folder').output.childItems, \n    json('{\n        \"name\": \"complete\",\n        \"type\": \"File\"\n    }'))",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "copy_PAK",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "BinarySource",
+												"storeSettings": {
+													"type": "FileServerReadSettings",
+													"recursive": true,
+													"deleteFilesAfterCompletion": false
+												},
+												"formatSettings": {
+													"type": "BinaryReadSettings"
+												}
+											},
+											"sink": {
+												"type": "BinarySink",
+												"storeSettings": {
+													"type": "AzureBlobFSWriteSettings",
+													"copyBehavior": "PreserveHierarchy"
+												}
+											},
+											"enableStaging": false
+										},
+										"inputs": [
+											{
+												"referenceName": "Data_PROD_PAK_Source_OnPrem",
+												"type": "DatasetReference",
+												"parameters": {
+													"folderPath": {
+														"value": "@activity('Get Metadata Folder').output.itemName",
+														"type": "Expression"
+													},
+													"subFolder": {
+														"value": "@{pipeline().parameters.subFolder}",
+														"type": "Expression"
+													}
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "Data_PROD_PAK_Sink_Azure",
+												"type": "DatasetReference",
+												"parameters": {
+													"folderPath": {
+														"value": "@activity('Get Metadata Folder').output.itemName",
+														"type": "Expression"
+													},
+													"subFolder": {
+														"value": "@{pipeline().parameters.subFolder}",
+														"type": "Expression"
+													},
+													"year": {
+														"value": "@{formatDateTime(pipeline().TriggerTime, 'yyyy')}",
+														"type": "Expression"
+													},
+													"month": {
+														"value": "@{formatDateTime(pipeline().TriggerTime, 'MM')}",
+														"type": "Expression"
+													},
+													"day": {
+														"value": "@{formatDateTime(pipeline().TriggerTime, 'dd')}",
+														"type": "Expression"
+													},
+													"basePath": {
+														"value": "@{pipeline().parameters.basePath}",
+														"type": "Expression"
+													}
+												}
+											}
+										]
+									},
+									{
+										"name": "Delete Folder",
+										"type": "Delete",
+										"dependsOn": [
+											{
+												"activity": "copy_PAK",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"dataset": {
+												"referenceName": "Data_PROD_PAK_Source_OnPrem",
+												"type": "DatasetReference",
+												"parameters": {
+													"folderPath": "@activity('Get Metadata Folder').output.itemName",
+													"subFolder": {
+														"value": "@{pipeline().parameters.subFolder}",
+														"type": "Expression"
+													}
+												}
+											},
+											"enableLogging": false,
+											"storeSettings": {
+												"type": "FileServerReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											}
+										}
+									},
+									{
+										"name": "Trigger Databricks Job",
+										"type": "ExecutePipeline",
+										"dependsOn": [
+											{
+												"activity": "copy_PAK",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"userProperties": [],
+										"typeProperties": {
+											"waitOnCompletion": false,
+											"parameters": {
+												"basePath": {
+													"value": "@{pipeline().parameters.basePath}",
+													"type": "Expression"
+												},
+												"folderPath": {
+													"value": "@{pipeline().parameters.subFolder}/@{formatDateTime(pipeline().TriggerTime, 'yyyy')}/@{formatDateTime(pipeline().TriggerTime, 'MM')}/@{formatDateTime(pipeline().TriggerTime, 'dd')}/@{activity('Get Metadata Folder').output.itemName}",
+													"type": "Expression"
+												}
+											}
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"subFolder": {
+				"type": "string"
+			},
+			"basePath": {
+				"type": "string",
+				"defaultValue": "use-cases/DataAnalyticsTeam/0862_Analysetool_Produktvarianten/raw"
+			}
+		},
+		"folder": {
+			"name": "TEST/subpipelines"
+		},
+		"annotations": []
+	}
+}
