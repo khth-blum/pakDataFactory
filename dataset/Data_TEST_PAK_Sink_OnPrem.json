@@ -10,9 +10,6 @@
 				"type": "string"
 			}
 		},
-		"folder": {
-			"name": "TEST_PAK"
-		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
