@@ -33,6 +33,22 @@
 					},
 					"enableStaging": false
 				},
+				"inputs": [
+					{
+						"referenceName": "Data_PROD_PAK_Source_Azure",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": {
+								"value": "@{pipeline().parameters.fileName}",
+								"type": "Expression"
+							},
+							"folderPath": {
+								"value": "@{pipeline().parameters.folderPath}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
 				"outputs": [
 					{
 						"referenceName": "Data_PROD_PAK_Sink_OnPrem",
@@ -54,6 +70,9 @@
 			"folderPath": {
 				"type": "string"
 			}
+		},
+		"folder": {
+			"name": "PROD"
 		},
 		"annotations": []
 	}
