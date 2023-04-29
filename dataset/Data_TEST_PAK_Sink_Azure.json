@@ -1,0 +1,44 @@
+{
+	"name": "Data_TEST_PAK_Sink_Azure",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_pak_sa_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"folderPath": {
+				"type": "string"
+			},
+			"subFolder": {
+				"type": "string"
+			},
+			"year": {
+				"type": "string"
+			},
+			"month": {
+				"type": "string"
+			},
+			"day": {
+				"type": "string"
+			},
+			"basePath": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "TEST"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@{dataset().basePath}/@{dataset().subFolder}/@{dataset().year}/@{dataset().month}/@{dataset().day}/@{dataset().folderPath}",
+					"type": "Expression"
+				},
+				"fileSystem": "test"
+			}
+		}
+	}
+}

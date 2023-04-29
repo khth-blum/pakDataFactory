@@ -1,5 +1,5 @@
 {
-	"name": "Data_PROD_PAK_Source_Azure",
+	"name": "Data_TEST_PAK_Source_Azure",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_pak_sa_gen2",
@@ -14,7 +14,7 @@
 			}
 		},
 		"folder": {
-			"name": "PROD"
+			"name": "TEST"
 		},
 		"annotations": [],
 		"type": "Binary",
@@ -26,7 +26,7 @@
 					"type": "Expression"
 				},
 				"folderPath": "@{dataset().folderPath}",
-				"fileSystem": "prod"
+				"fileSystem": "test"
 			}
 		}
 	}
