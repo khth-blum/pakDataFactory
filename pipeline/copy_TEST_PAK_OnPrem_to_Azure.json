@@ -258,15 +258,6 @@
 												"enablePartitionDiscovery": false
 											}
 										}
-									},
-									{
-										"name": "Trigger Databricks Job",
-										"type": "ExecutePipeline",
-										"dependsOn": [],
-										"userProperties": [],
-										"typeProperties": {
-											"waitOnCompletion": false
-										}
 									}
 								]
 							}
