@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "Data_PROD_PAK_Source_OnPrem",
+						"referenceName": "Data_TEST_PAK_Source_OnPrem",
 						"type": "DatasetReference",
 						"parameters": {
 							"subFolder": {
@@ -93,7 +93,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataset": {
-									"referenceName": "Data_PROD_PAK_Source_OnPrem",
+									"referenceName": "Data_TEST_PAK_Source_OnPrem",
 									"type": "DatasetReference",
 									"parameters": {
 										"folderPath": {
@@ -173,7 +173,7 @@
 										},
 										"inputs": [
 											{
-												"referenceName": "Data_PROD_PAK_Source_OnPrem",
+												"referenceName": "Data_TEST_PAK_Source_OnPrem",
 												"type": "DatasetReference",
 												"parameters": {
 													"folderPath": {
@@ -189,7 +189,7 @@
 										],
 										"outputs": [
 											{
-												"referenceName": "Data_PROD_PAK_Sink_Azure",
+												"referenceName": "Data_TEST_PAK_Sink_Azure",
 												"type": "DatasetReference",
 												"parameters": {
 													"folderPath": {
@@ -241,7 +241,7 @@
 										"userProperties": [],
 										"typeProperties": {
 											"dataset": {
-												"referenceName": "Data_PROD_PAK_Source_OnPrem",
+												"referenceName": "Data_TEST_PAK_Source_OnPrem",
 												"type": "DatasetReference",
 												"parameters": {
 													"folderPath": "@activity('Get Metadata Folder').output.itemName",
@@ -298,7 +298,7 @@
 			},
 			"basePath": {
 				"type": "string",
-				"defaultValue": "use-cases/DataAnalyticsTeam/0862_Analysetool_Produktvarianten/raw"
+				"defaultValue": "raw"
 			}
 		},
 		"folder": {
