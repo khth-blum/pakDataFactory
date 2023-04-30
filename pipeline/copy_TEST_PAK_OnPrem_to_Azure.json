@@ -19,10 +19,6 @@
 						"referenceName": "Data_TEST_PAK_Source_OnPrem",
 						"type": "DatasetReference",
 						"parameters": {
-							"folderPath": {
-								"value": "@{pipeline().parameters.basePath}",
-								"type": "Expression"
-							},
 							"subFolder": {
 								"value": "@{pipeline().parameters.subFolder}",
 								"type": "Expression"
