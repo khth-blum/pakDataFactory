@@ -96,10 +96,6 @@
 									"referenceName": "Data_TEST_PAK_Source_OnPrem",
 									"type": "DatasetReference",
 									"parameters": {
-										"folderPath": {
-											"value": "@item().name",
-											"type": "Expression"
-										},
 										"subFolder": {
 											"value": "@{pipeline().parameters.subFolder}",
 											"type": "Expression"
@@ -240,7 +236,6 @@
 												"referenceName": "Data_TEST_PAK_Source_OnPrem",
 												"type": "DatasetReference",
 												"parameters": {
-													"folderPath": "@activity('Get Metadata Folder').output.itemName",
 													"subFolder": {
 														"value": "@{pipeline().parameters.subFolder}",
 														"type": "Expression"
