@@ -176,10 +176,6 @@
 												"referenceName": "Data_TEST_PAK_Source_OnPrem",
 												"type": "DatasetReference",
 												"parameters": {
-													"folderPath": {
-														"value": "@activity('Get Metadata Folder').output.itemName",
-														"type": "Expression"
-													},
 													"subFolder": {
 														"value": "@{pipeline().parameters.subFolder}",
 														"type": "Expression"
