@@ -6,9 +6,6 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"folderPath": {
-				"type": "string"
-			},
 			"subFolder": {
 				"type": "string"
 			}
@@ -22,7 +19,7 @@
 			"location": {
 				"type": "FileServerLocation",
 				"folderPath": {
-					"value": "outputLake/@{dataset().subFolder}/@{dataset().folderPath}",
+					"value": "outputLake/@{dataset().subFolder}",
 					"type": "Expression"
 				}
 			}
