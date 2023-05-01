@@ -170,18 +170,12 @@
 										"inputs": [
 											{
 												"referenceName": "Data_TEST_PAK_Source_OnPrem",
-												"type": "DatasetReference",
-												"parameters": {
-													"subFolder": {
-														"value": "@{pipeline().parameters.subFolder}",
-														"type": "Expression"
-													}
-												}
+												"type": "DatasetReference"
 											}
 										],
 										"outputs": [
 											{
-												"referenceName": "Data_TEST_PAK_Sink_Azure",
+												"referenceName": "Data_PROD_PAK_Sink_Azure",
 												"type": "DatasetReference",
 												"parameters": {
 													"folderPath": {
@@ -233,9 +227,10 @@
 										"userProperties": [],
 										"typeProperties": {
 											"dataset": {
-												"referenceName": "Data_TEST_PAK_Source_OnPrem",
+												"referenceName": "Data_PROD_PAK_Source_OnPrem",
 												"type": "DatasetReference",
 												"parameters": {
+													"folderPath": "@activity('Get Metadata Folder').output.itemName",
 													"subFolder": {
 														"value": "@{pipeline().parameters.subFolder}",
 														"type": "Expression"
@@ -247,6 +242,32 @@
 												"type": "FileServerReadSettings",
 												"recursive": true,
 												"enablePartitionDiscovery": false
+											}
+										}
+									},
+									{
+										"name": "Trigger Databricks Job",
+										"type": "ExecutePipeline",
+										"dependsOn": [
+											{
+												"activity": "copy_PAK",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"userProperties": [],
+										"typeProperties": {
+											"waitOnCompletion": false,
+											"parameters": {
+												"basePath": {
+													"value": "@{pipeline().parameters.basePath}",
+													"type": "Expression"
+												},
+												"folderPath": {
+													"value": "@{pipeline().parameters.subFolder}/@{formatDateTime(pipeline().TriggerTime, 'yyyy')}/@{formatDateTime(pipeline().TriggerTime, 'MM')}/@{formatDateTime(pipeline().TriggerTime, 'dd')}/@{activity('Get Metadata Folder').output.itemName}",
+													"type": "Expression"
+												}
 											}
 										}
 									}
@@ -263,7 +284,7 @@
 			},
 			"basePath": {
 				"type": "string",
-				"defaultValue": "raw"
+				"defaultValue": "use-cases/DataAnalyticsTeam/0862_Analysetool_Produktvarianten/raw"
 			}
 		},
 		"folder": {
