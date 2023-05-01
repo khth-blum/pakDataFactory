@@ -130,7 +130,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@contains(\n    activity('Get Metadata Folder').output.childItems, \n    json('{\n        \"name\": \"Cancelled\",\n        \"type\": \"File\"\n    }'))",
+									"value": "@contains(\n    activity('Get Metadata Folder').output.childItems, \n    json('{\n        \"name\": \"test\",\n        \"type\": \"File\"\n    }'))",
 									"type": "Expression"
 								},
 								"ifTrueActivities": [
