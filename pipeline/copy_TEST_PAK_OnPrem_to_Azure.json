@@ -234,7 +234,7 @@
 											"waitOnCompletion": false,
 											"parameters": {
 												"environment": {
-													"value": "@{pipeline().parameters.environmen}",
+													"value": "@{pipeline().parameters.environment}",
 													"type": "Expression"
 												},
 												"folderPath": {
