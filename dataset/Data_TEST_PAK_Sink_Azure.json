@@ -20,6 +20,9 @@
 			},
 			"day": {
 				"type": "string"
+			},
+			"basePath": {
+				"type": "string"
 			}
 		},
 		"folder": {
@@ -31,7 +34,7 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"folderPath": {
-					"value": "@{dataset().subFolder}/@{dataset().year}/@{dataset().month}/@{dataset().day}/@{dataset().folderPath}",
+					"value": "@{dataset().basePath}/@{dataset().subFolder}/@{dataset().year}/@{dataset().month}/@{dataset().day}/@{dataset().folderPath}",
 					"type": "Expression"
 				},
 				"fileSystem": "test"

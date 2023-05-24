@@ -33,7 +33,11 @@
 			},
 			"basePath": {
 				"type": "string",
-				"defaultValue": "/test/raw/"
+				"defaultValue": "raw"
+			},
+			"environment": {
+				"type": "string",
+				"defaultValue": "test"
 			}
 		},
 		"folder": {

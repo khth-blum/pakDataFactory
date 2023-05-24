@@ -38,7 +38,7 @@
 			}
 		],
 		"parameters": {
-			"basePath": {
+			"environment": {
 				"type": "string"
 			},
 			"folderPath": {

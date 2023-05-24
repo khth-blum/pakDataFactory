@@ -205,6 +205,10 @@
 													"day": {
 														"value": "@{formatDateTime(pipeline().TriggerTime, 'dd')}",
 														"type": "Expression"
+													},
+													"basePath": {
+														"value": "@{pipeline().parameters.subFolder}",
+														"type": "Expression"
 													}
 												}
 											}
@@ -229,8 +233,8 @@
 											},
 											"waitOnCompletion": false,
 											"parameters": {
-												"basePath": {
-													"value": "@{pipeline().parameters.basePath}",
+												"environment": {
+													"value": "@{pipeline().parameters.environmen}",
 													"type": "Expression"
 												},
 												"folderPath": {
@@ -254,7 +258,11 @@
 			},
 			"basePath": {
 				"type": "string",
-				"defaultValue": "/mnt/test/raw"
+				"defaultValue": "raw"
+			},
+			"environment": {
+				"type": "string",
+				"defaultValue": "test"
 			}
 		},
 		"folder": {
