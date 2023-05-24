@@ -207,7 +207,7 @@
 														"type": "Expression"
 													},
 													"basePath": {
-														"value": "@{pipeline().parameters.subFolder}",
+														"value": "@{pipeline().parameters.basePath}",
 														"type": "Expression"
 													}
 												}
