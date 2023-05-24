@@ -33,7 +33,7 @@
 			},
 			"basePath": {
 				"type": "string",
-				"defaultValue": "raw"
+				"defaultValue": "/mnt/test/raw"
 			}
 		},
 		"folder": {
