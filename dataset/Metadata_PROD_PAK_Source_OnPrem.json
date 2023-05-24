@@ -1,0 +1,31 @@
+{
+	"name": "Metadata_PROD_PAK_Source_OnPrem",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_pak_dfs_prod",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"folderPath": {
+				"type": "string"
+			},
+			"subFolder": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "PROD"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"folderPath": {
+					"value": "outputLake/@{dataset().subFolder}/@{dataset().folderPath}",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}

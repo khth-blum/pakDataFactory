@@ -15,14 +15,14 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/Users/thomas.kohler@blum.com/PAK_TEST",
+					"notebookPath": "/Repos/pak/dev_multi_env_at_workbooks/pv_triggering_proxy",
 					"baseParameters": {
 						"idempotency_token": {
 							"value": "@{pipeline().RunId}",
 							"type": "Expression"
 						},
-						"basepath": {
-							"value": "@{pipeline().parameters.basePath}",
+						"environment": {
+							"value": "@{pipeline().parameters.environment}",
 							"type": "Expression"
 						},
 						"folderpath": {
@@ -38,13 +38,11 @@
 			}
 		],
 		"parameters": {
-			"basePath": {
-				"type": "string",
-				"defaultValue": "prod"
+			"environment": {
+				"type": "string"
 			},
 			"folderPath": {
-				"type": "string",
-				"defaultValue": "prod"
+				"type": "string"
 			}
 		},
 		"folder": {

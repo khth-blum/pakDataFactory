@@ -33,7 +33,11 @@
 			},
 			"basePath": {
 				"type": "string",
-				"defaultValue": "/Users/thomas.kohler@blum.com/PAK_TEST"
+				"defaultValue": "raw"
+			},
+			"environment": {
+				"type": "string",
+				"defaultValue": "prod"
 			}
 		},
 		"folder": {
