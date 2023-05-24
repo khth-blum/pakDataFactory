@@ -93,7 +93,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataset": {
-									"referenceName": "Metadata_TEST_PAK_Source_OnPrem",
+									"referenceName": "Metadata_PROD_PAK_Source_OnPrem",
 									"type": "DatasetReference",
 									"parameters": {
 										"folderPath": {
