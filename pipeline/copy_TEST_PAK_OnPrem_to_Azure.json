@@ -205,10 +205,6 @@
 													"day": {
 														"value": "@{formatDateTime(pipeline().TriggerTime, 'dd')}",
 														"type": "Expression"
-													},
-													"basePath": {
-														"value": "@{pipeline().parameters.basePath}",
-														"type": "Expression"
 													}
 												}
 											}
