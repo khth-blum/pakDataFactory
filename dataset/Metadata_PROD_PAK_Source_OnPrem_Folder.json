@@ -2,7 +2,7 @@
 	"name": "Metadata_PROD_PAK_Source_OnPrem_Folder",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "ls_pak_dfs_test",
+			"referenceName": "ls_pak_dfs_prod",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
