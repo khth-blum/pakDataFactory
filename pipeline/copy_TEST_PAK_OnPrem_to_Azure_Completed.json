@@ -29,11 +29,11 @@
 		"parameters": {
 			"subFolder": {
 				"type": "string",
-				"defaultValue": "/raw/Completed"
+				"defaultValue": "Completed"
 			},
 			"basePath": {
 				"type": "string",
-				"defaultValue": "/test"
+				"defaultValue": "/test/raw/"
 			}
 		},
 		"folder": {
