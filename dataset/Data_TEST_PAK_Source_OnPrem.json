@@ -8,6 +8,9 @@
 		"parameters": {
 			"subFolder": {
 				"type": "string"
+			},
+			"folderPath": {
+				"type": "string"
 			}
 		},
 		"folder": {
@@ -19,7 +22,7 @@
 			"location": {
 				"type": "FileServerLocation",
 				"folderPath": {
-					"value": "outputLake/@{dataset().subFolder}",
+					"value": "outputLake/@{dataset().subFolder}/@{dataset().folderPath}",
 					"type": "Expression"
 				}
 			}
