@@ -282,7 +282,8 @@
 		],
 		"parameters": {
 			"subFolder": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "Completed"
 			},
 			"basePath": {
 				"type": "string",
