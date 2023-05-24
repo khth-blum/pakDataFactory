@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "Data_TEST_PAK_Source_OnPrem",
+						"referenceName": "Metadata_TEST_PAK_Source_OnPrem_Folder",
 						"type": "DatasetReference",
 						"parameters": {
 							"subFolder": {
@@ -93,9 +93,13 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataset": {
-									"referenceName": "Data_TEST_PAK_Source_OnPrem",
+									"referenceName": "Metadata_TEST_PAK_Source_OnPrem",
 									"type": "DatasetReference",
 									"parameters": {
+										"folderPath": {
+											"value": "@item().name",
+											"type": "Expression"
+										},
 										"subFolder": {
 											"value": "@{pipeline().parameters.subFolder}",
 											"type": "Expression"
@@ -173,6 +177,10 @@
 												"type": "DatasetReference",
 												"parameters": {
 													"subFolder": {
+														"value": "@activity('Get Metadata Folder').output.itemName",
+														"type": "Expression"
+													},
+													"folderPath": {
 														"value": "@{pipeline().parameters.subFolder}",
 														"type": "Expression"
 													}
@@ -230,6 +238,10 @@
 												"type": "DatasetReference",
 												"parameters": {
 													"subFolder": {
+														"value": "@activity('Get Metadata Folder').output.itemName",
+														"type": "Expression"
+													},
+													"folderPath": {
 														"value": "@{pipeline().parameters.subFolder}",
 														"type": "Expression"
 													}

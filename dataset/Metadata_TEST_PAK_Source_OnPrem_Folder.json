@@ -1,0 +1,28 @@
+{
+	"name": "Metadata_TEST_PAK_Source_OnPrem_Folder",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_pak_dfs_test",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"subFolder": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "TEST"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"folderPath": {
+					"value": "outputLake/@{dataset().subFolder}",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}
