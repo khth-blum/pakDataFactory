@@ -15,7 +15,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/Repos/pak/dev_multi_env_at_workbooks/pv_triggering_proxy",
+					"notebookPath": "/Repos/pak/test_multi_env_at_workbooks/pv_triggering_proxy",
 					"baseParameters": {
 						"idempotency_token": {
 							"value": "@{pipeline().RunId}",
