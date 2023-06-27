@@ -21,10 +21,6 @@
 							"value": "@{pipeline().RunId}",
 							"type": "Expression"
 						},
-						"environment": {
-							"value": "@{pipeline().parameters.environment}",
-							"type": "Expression"
-						},
 						"folderpath": {
 							"value": "@{pipeline().parameters.folderPath}",
 							"type": "Expression"
