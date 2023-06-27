@@ -35,7 +35,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "Data_PROD_PAK_Source_Azure",
+						"referenceName": "Data_TEST_PAK_Source_Azure",
 						"type": "DatasetReference",
 						"parameters": {
 							"fileName": {
