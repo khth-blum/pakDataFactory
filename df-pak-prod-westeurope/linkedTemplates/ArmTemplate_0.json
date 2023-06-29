@@ -1,0 +1,754 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "df-pak-prod-westeurope"
+		},
+		"kvdataplatform_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kvdataplatformprodwe.vault.azure.net/"
+		},
+		"SHIR-DLIR901-LINKED_properties_typeProperties_linkedInfo_resourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/3cd239b3-3363-4e70-add4-e14dab142dca/resourcegroups/PoCDataLake/providers/Microsoft.DataFactory/factories/PoCDLDF/integrationruntimes/dlir901"
+		},
+		"ls_pak_dfs_prod_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "\\\\net.blum\\dfs\\SYS\\DataPlatform\\PROD_PAK"
+		},
+		"ls_pak_dfs_prod_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "BAULAN\\DataplatformIntegrat"
+		},
+		"ls_pak_dfs_test_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "\\\\net.blum\\dfs\\SYS\\DataPlatform\\TEST_PAK"
+		},
+		"ls_pak_dfs_test_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "BAULAN\\DataplatformIntegrat"
+		},
+		"ls_pak_sa_gen2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://sapakprodwesteurope.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/kvdataplatform')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('kvdataplatform_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_pak_dbw_prod')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-843571675270107.7.azuredatabricks.net",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/50888be5-ad58-4821-afeb-b8114fdb5353/resourceGroups/rg-pak-prod-westeurope/providers/Microsoft.Databricks/workspaces/dbs-pak-prod-westeurope",
+					"newClusterNodeType": "Standard_DS3_v2",
+					"newClusterNumOfWorker": "1",
+					"newClusterSparkEnvVars": {
+						"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+					},
+					"newClusterVersion": "11.3.x-scala2.12",
+					"clusterOption": "Fixed",
+					"newClusterInitScripts": []
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SHIR-DLIR901-LINKED')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {
+					"linkedInfo": {
+						"resourceId": "[parameters('SHIR-DLIR901-LINKED_properties_typeProperties_linkedInfo_resourceId')]",
+						"authorizationType": "Rbac"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger_prod_pak_databricks_workflow')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "trigger_prod_pak_databricks_workflow",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/pak/dev_multi_env_at_workbooks/pv_triggering_proxy",
+							"baseParameters": {
+								"idempotency_token": {
+									"value": "@{pipeline().RunId}",
+									"type": "Expression"
+								},
+								"environment": {
+									"value": "@{pipeline().parameters.environment}",
+									"type": "Expression"
+								},
+								"folderpath": {
+									"value": "@{pipeline().parameters.folderPath}",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_pak_dbw_prod",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"environment": {
+						"type": "string"
+					},
+					"folderPath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD/subpipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dbw_prod')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger_test_pak_databricks_workflow')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "trigger_test_pak_databricks_workflow",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/pak/test_multi_env_at_workbooks/pv_triggering_proxy",
+							"baseParameters": {
+								"idempotency_token": {
+									"value": "@{pipeline().RunId}",
+									"type": "Expression"
+								},
+								"folderpath": {
+									"value": "@{pipeline().parameters.folderPath}",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_pak_dbw_prod",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"environment": {
+						"type": "string"
+					},
+					"folderPath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST/subpipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dbw_prod')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_pak_dfs_prod')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('ls_pak_dfs_prod_properties_typeProperties_host')]",
+					"userId": "[parameters('ls_pak_dfs_prod_properties_typeProperties_userId')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "kvdataplatform",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "OnPremDataPlatformIntegration"
+					}
+				},
+				"connectVia": {
+					"referenceName": "SHIR-DLIR901-LINKED",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/SHIR-DLIR901-LINKED')]",
+				"[concat(variables('factoryId'), '/linkedServices/kvdataplatform')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_pak_dfs_test')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('ls_pak_dfs_test_properties_typeProperties_host')]",
+					"userId": "[parameters('ls_pak_dfs_test_properties_typeProperties_userId')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "kvdataplatform",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "OnPremDataPlatformIntegration"
+					}
+				},
+				"connectVia": {
+					"referenceName": "SHIR-DLIR901-LINKED",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/SHIR-DLIR901-LINKED')]",
+				"[concat(variables('factoryId'), '/linkedServices/kvdataplatform')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_pak_sa_gen2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ls_pak_sa_gen2_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "kvdataplatform",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "sapakprodwesteurope"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/kvdataplatform')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_PROD_PAK_Sink_Azure')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_sa_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "string"
+					},
+					"subFolder": {
+						"type": "string"
+					},
+					"year": {
+						"type": "string"
+					},
+					"month": {
+						"type": "string"
+					},
+					"day": {
+						"type": "string"
+					},
+					"basePath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@{dataset().basePath}/@{dataset().subFolder}/@{dataset().year}/@{dataset().month}/@{dataset().day}/@{dataset().folderPath}",
+							"type": "Expression"
+						},
+						"fileSystem": "prod"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_sa_gen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_PROD_PAK_Sink_OnPrem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_prod",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": {
+							"value": "@{dataset().fileName}",
+							"type": "Expression"
+						},
+						"folderPath": "inputStep"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_prod')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_PROD_PAK_Source_Azure')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_sa_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					},
+					"folderPath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@{dataset().fileName}",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@{dataset().folderPath}",
+							"type": "Expression"
+						},
+						"fileSystem": "prod"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_sa_gen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_PROD_PAK_Source_OnPrem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_prod",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "string"
+					},
+					"subFolder": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": {
+							"value": "outputLake/@{dataset().subFolder}/@{dataset().folderPath}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_prod')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_TEST_PAK_Sink_Azure')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_sa_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "string"
+					},
+					"subFolder": {
+						"type": "string"
+					},
+					"year": {
+						"type": "string"
+					},
+					"month": {
+						"type": "string"
+					},
+					"day": {
+						"type": "string"
+					},
+					"basePath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@{dataset().basePath}/@{dataset().subFolder}/@{dataset().year}/@{dataset().month}/@{dataset().day}/@{dataset().folderPath}",
+							"type": "Expression"
+						},
+						"fileSystem": "test"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_sa_gen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_TEST_PAK_Sink_OnPrem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_test",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": {
+							"value": "@{dataset().fileName}",
+							"type": "Expression"
+						},
+						"folderPath": "inputStep"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_test')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_TEST_PAK_Source_Azure')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_sa_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					},
+					"folderPath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@{dataset().fileName}",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@{dataset().folderPath}",
+							"type": "Expression"
+						},
+						"fileSystem": "test"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_sa_gen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_TEST_PAK_Source_OnPrem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_test",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"subFolder": {
+						"type": "string"
+					},
+					"folderPath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": {
+							"value": "outputLake/@{dataset().subFolder}/@{dataset().folderPath}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_test')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Metadata_PROD_PAK_Source_OnPrem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_prod",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "string"
+					},
+					"subFolder": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": {
+							"value": "outputLake/@{dataset().subFolder}/@{dataset().folderPath}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_prod')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Metadata_PROD_PAK_Source_OnPrem_Folder')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_prod",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"subFolder": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": {
+							"value": "outputLake/@{dataset().subFolder}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_prod')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Metadata_TEST_PAK_Source_OnPrem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_test",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "string"
+					},
+					"subFolder": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": {
+							"value": "outputLake/@{dataset().subFolder}/@{dataset().folderPath}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_test')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Metadata_TEST_PAK_Source_OnPrem_Folder')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_test",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"subFolder": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": {
+							"value": "outputLake/@{dataset().subFolder}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_test')]"
+			]
+		}
+	]
+}

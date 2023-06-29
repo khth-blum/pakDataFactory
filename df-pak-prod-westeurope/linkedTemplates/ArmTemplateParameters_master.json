@@ -1,0 +1,45 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "df-pak-prod-westeurope"
+		},
+		"kvdataplatform_properties_typeProperties_baseUrl": {
+			"value": "https://kvdataplatformprodwe.vault.azure.net/"
+		},
+		"ls_pak_dfs_prod_properties_typeProperties_host": {
+			"value": "\\\\net.blum\\dfs\\SYS\\DataPlatform\\PROD_PAK"
+		},
+		"ls_pak_dfs_prod_properties_typeProperties_userId": {
+			"value": "BAULAN\\DataplatformIntegrat"
+		},
+		"ls_pak_dfs_test_properties_typeProperties_host": {
+			"value": "\\\\net.blum\\dfs\\SYS\\DataPlatform\\TEST_PAK"
+		},
+		"ls_pak_dfs_test_properties_typeProperties_userId": {
+			"value": "BAULAN\\DataplatformIntegrat"
+		},
+		"ls_pak_sa_gen2_properties_typeProperties_url": {
+			"value": "https://sapakprodwesteurope.dfs.core.windows.net"
+		},
+		"copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_fileName": {
+			"value": "@triggerBody().fileName"
+		},
+		"copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_folderPath": {
+			"value": "@triggerBody().folderPath"
+		},
+		"copy_TEST_PAK_Azure_to_onPrem_properties_typeProperties_scope": {
+			"value": "/subscriptions/50888be5-ad58-4821-afeb-b8114fdb5353/resourceGroups/rg-pak-prod-westeurope/providers/Microsoft.Storage/storageAccounts/sapakprodwesteurope"
+		},
+		"SHIR-DLIR901-LINKED_properties_typeProperties_linkedInfo_resourceId": {
+			"value": "/subscriptions/3cd239b3-3363-4e70-add4-e14dab142dca/resourcegroups/PoCDataLake/providers/Microsoft.DataFactory/factories/PoCDLDF/integrationruntimes/dlir901"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

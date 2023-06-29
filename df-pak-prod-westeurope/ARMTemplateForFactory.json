@@ -1,0 +1,1730 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "df-pak-prod-westeurope"
+		},
+		"kvdataplatform_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kvdataplatformprodwe.vault.azure.net/"
+		},
+		"ls_pak_dfs_prod_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "\\\\net.blum\\dfs\\SYS\\DataPlatform\\PROD_PAK"
+		},
+		"ls_pak_dfs_prod_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "BAULAN\\DataplatformIntegrat"
+		},
+		"ls_pak_dfs_test_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "\\\\net.blum\\dfs\\SYS\\DataPlatform\\TEST_PAK"
+		},
+		"ls_pak_dfs_test_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "BAULAN\\DataplatformIntegrat"
+		},
+		"ls_pak_sa_gen2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://sapakprodwesteurope.dfs.core.windows.net"
+		},
+		"copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_fileName": {
+			"type": "string",
+			"defaultValue": "@triggerBody().fileName"
+		},
+		"copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_folderPath": {
+			"type": "string",
+			"defaultValue": "@triggerBody().folderPath"
+		},
+		"copy_TEST_PAK_Azure_to_onPrem_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/50888be5-ad58-4821-afeb-b8114fdb5353/resourceGroups/rg-pak-prod-westeurope/providers/Microsoft.Storage/storageAccounts/sapakprodwesteurope"
+		},
+		"SHIR-DLIR901-LINKED_properties_typeProperties_linkedInfo_resourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/3cd239b3-3363-4e70-add4-e14dab142dca/resourcegroups/PoCDataLake/providers/Microsoft.DataFactory/factories/PoCDLDF/integrationruntimes/dlir901"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_PROD_PAK_Azure_to_onPrem')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "FileServerWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Data_PROD_PAK_Source_Azure",
+								"type": "DatasetReference",
+								"parameters": {
+									"fileName": {
+										"value": "@{pipeline().parameters.fileName}",
+										"type": "Expression"
+									},
+									"folderPath": {
+										"value": "@{pipeline().parameters.folderPath}",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Data_PROD_PAK_Sink_OnPrem",
+								"type": "DatasetReference",
+								"parameters": {
+									"fileName": {
+										"value": "@{pipeline().parameters.fileName}",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					},
+					"folderPath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Data_PROD_PAK_Source_Azure')]",
+				"[concat(variables('factoryId'), '/datasets/Data_PROD_PAK_Sink_OnPrem')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_PROD_PAK_OnPrem_to_Azure')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Metadata outputLake",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "Metadata_PROD_PAK_Source_OnPrem_Folder",
+								"type": "DatasetReference",
+								"parameters": {
+									"subFolder": {
+										"value": "@{pipeline().parameters.subFolder}",
+										"type": "Expression"
+									}
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "FileServerReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "BinaryReadSettings"
+							}
+						}
+					},
+					{
+						"name": "Filter Folders",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Get Metadata outputLake",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Metadata outputLake').output.childItems",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().type, 'Folder')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ForEach Folder",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Filter Folders",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Filter Folders').output.Value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Get Metadata Folder",
+									"type": "GetMetadata",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "Metadata_PROD_PAK_Source_OnPrem",
+											"type": "DatasetReference",
+											"parameters": {
+												"folderPath": {
+													"value": "@item().name",
+													"type": "Expression"
+												},
+												"subFolder": {
+													"value": "@{pipeline().parameters.subFolder}",
+													"type": "Expression"
+												}
+											}
+										},
+										"fieldList": [
+											"childItems",
+											"itemName"
+										],
+										"storeSettings": {
+											"type": "FileServerReadSettings",
+											"recursive": true,
+											"enablePartitionDiscovery": false
+										},
+										"formatSettings": {
+											"type": "BinaryReadSettings"
+										}
+									}
+								},
+								{
+									"name": "If Metadata is complete",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "Get Metadata Folder",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@contains(\n    activity('Get Metadata Folder').output.childItems, \n    json('{\n        \"name\": \"complete\",\n        \"type\": \"File\"\n    }'))",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "copy_PAK",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "BinarySource",
+														"storeSettings": {
+															"type": "FileServerReadSettings",
+															"recursive": true,
+															"deleteFilesAfterCompletion": false
+														},
+														"formatSettings": {
+															"type": "BinaryReadSettings"
+														}
+													},
+													"sink": {
+														"type": "BinarySink",
+														"storeSettings": {
+															"type": "AzureBlobFSWriteSettings",
+															"copyBehavior": "PreserveHierarchy"
+														}
+													},
+													"enableStaging": false
+												},
+												"inputs": [
+													{
+														"referenceName": "Data_PROD_PAK_Source_OnPrem",
+														"type": "DatasetReference",
+														"parameters": {
+															"folderPath": {
+																"value": "@activity('Get Metadata Folder').output.itemName",
+																"type": "Expression"
+															},
+															"subFolder": {
+																"value": "@{pipeline().parameters.subFolder}",
+																"type": "Expression"
+															}
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "Data_PROD_PAK_Sink_Azure",
+														"type": "DatasetReference",
+														"parameters": {
+															"folderPath": {
+																"value": "@activity('Get Metadata Folder').output.itemName",
+																"type": "Expression"
+															},
+															"subFolder": {
+																"value": "@{pipeline().parameters.subFolder}",
+																"type": "Expression"
+															},
+															"year": {
+																"value": "@{formatDateTime(pipeline().TriggerTime, 'yyyy')}",
+																"type": "Expression"
+															},
+															"month": {
+																"value": "@{formatDateTime(pipeline().TriggerTime, 'MM')}",
+																"type": "Expression"
+															},
+															"day": {
+																"value": "@{formatDateTime(pipeline().TriggerTime, 'dd')}",
+																"type": "Expression"
+															},
+															"basePath": {
+																"value": "@{pipeline().parameters.basePath}",
+																"type": "Expression"
+															}
+														}
+													}
+												]
+											},
+											{
+												"name": "Trigger Databricks Job",
+												"type": "ExecutePipeline",
+												"dependsOn": [
+													{
+														"activity": "copy_PAK",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "trigger_prod_pak_databricks_workflow",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": false,
+													"parameters": {
+														"environment": {
+															"value": "@{pipeline().parameters.environment}",
+															"type": "Expression"
+														},
+														"folderPath": {
+															"value": "@{pipeline().parameters.subFolder}/@{formatDateTime(pipeline().TriggerTime, 'yyyy')}/@{formatDateTime(pipeline().TriggerTime, 'MM')}/@{formatDateTime(pipeline().TriggerTime, 'dd')}/@{activity('Get Metadata Folder').output.itemName}",
+															"type": "Expression"
+														}
+													}
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"subFolder": {
+						"type": "string"
+					},
+					"basePath": {
+						"type": "string",
+						"defaultValue": "raw"
+					},
+					"environment": {
+						"type": "string",
+						"defaultValue": "prod"
+					}
+				},
+				"folder": {
+					"name": "PROD/subpipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Metadata_PROD_PAK_Source_OnPrem_Folder')]",
+				"[concat(variables('factoryId'), '/datasets/Metadata_PROD_PAK_Source_OnPrem')]",
+				"[concat(variables('factoryId'), '/datasets/Data_PROD_PAK_Source_OnPrem')]",
+				"[concat(variables('factoryId'), '/datasets/Data_PROD_PAK_Sink_Azure')]",
+				"[concat(variables('factoryId'), '/pipelines/trigger_prod_pak_databricks_workflow')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_PROD_PAK_OnPrem_to_Azure_Cancelled')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copy_PROD_PAK_OnPrem_to_Azure",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "copy_PROD_PAK_OnPrem_to_Azure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"subFolder": {
+									"value": "@{pipeline().parameters.subFolder}",
+									"type": "Expression"
+								},
+								"basePath": {
+									"value": "@{pipeline().parameters.basePath}",
+									"type": "Expression"
+								},
+								"environment": {
+									"value": "@{pipeline().parameters.environment}",
+									"type": "Expression"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"subFolder": {
+						"type": "string",
+						"defaultValue": "Cancelled"
+					},
+					"basePath": {
+						"type": "string",
+						"defaultValue": "raw"
+					},
+					"environment": {
+						"type": "string",
+						"defaultValue": "prod"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/copy_PROD_PAK_OnPrem_to_Azure')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_PROD_PAK_OnPrem_to_Azure_Completed')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copy_PROD_PAK_OnPrem_to_Azure",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "copy_PROD_PAK_OnPrem_to_Azure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"subFolder": {
+									"value": "@{pipeline().parameters.subFolder}",
+									"type": "Expression"
+								},
+								"basePath": {
+									"value": "@{pipeline().parameters.basePath}",
+									"type": "Expression"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"subFolder": {
+						"type": "string",
+						"defaultValue": "Completed"
+					},
+					"basePath": {
+						"type": "string",
+						"defaultValue": "raw"
+					},
+					"environment": {
+						"type": "string",
+						"defaultValue": "prod"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/copy_PROD_PAK_OnPrem_to_Azure')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_TEST_PAK_Azure_to_onPrem')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "FileServerWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Data_TEST_PAK_Source_Azure",
+								"type": "DatasetReference",
+								"parameters": {
+									"fileName": {
+										"value": "@{pipeline().parameters.fileName}",
+										"type": "Expression"
+									},
+									"folderPath": {
+										"value": "@{pipeline().parameters.folderPath}",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Data_TEST_PAK_Sink_OnPrem",
+								"type": "DatasetReference",
+								"parameters": {
+									"fileName": {
+										"value": "@{pipeline().parameters.fileName}",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					},
+					"folderPath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Data_TEST_PAK_Source_Azure')]",
+				"[concat(variables('factoryId'), '/datasets/Data_TEST_PAK_Sink_OnPrem')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_TEST_PAK_OnPrem_to_Azure')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Metadata outputLake",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "Metadata_TEST_PAK_Source_OnPrem_Folder",
+								"type": "DatasetReference",
+								"parameters": {
+									"subFolder": {
+										"value": "@{pipeline().parameters.subFolder}",
+										"type": "Expression"
+									}
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "FileServerReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "BinaryReadSettings"
+							}
+						}
+					},
+					{
+						"name": "Filter Folders",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Get Metadata outputLake",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Metadata outputLake').output.childItems",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().type, 'Folder')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ForEach Folder",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Filter Folders",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Filter Folders').output.Value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Get Metadata Folder",
+									"type": "GetMetadata",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "Metadata_TEST_PAK_Source_OnPrem",
+											"type": "DatasetReference",
+											"parameters": {
+												"folderPath": {
+													"value": "@item().name",
+													"type": "Expression"
+												},
+												"subFolder": {
+													"value": "@{pipeline().parameters.subFolder}",
+													"type": "Expression"
+												}
+											}
+										},
+										"fieldList": [
+											"childItems",
+											"itemName"
+										],
+										"storeSettings": {
+											"type": "FileServerReadSettings",
+											"recursive": true,
+											"enablePartitionDiscovery": false
+										},
+										"formatSettings": {
+											"type": "BinaryReadSettings"
+										}
+									}
+								},
+								{
+									"name": "If Metadata is complete",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "Get Metadata Folder",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@contains(\n    activity('Get Metadata Folder').output.childItems, \n    json('{\n        \"name\": \"complete\",\n        \"type\": \"File\"\n    }'))",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "copy_PAK",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "BinarySource",
+														"storeSettings": {
+															"type": "FileServerReadSettings",
+															"recursive": true,
+															"deleteFilesAfterCompletion": false
+														},
+														"formatSettings": {
+															"type": "BinaryReadSettings"
+														}
+													},
+													"sink": {
+														"type": "BinarySink",
+														"storeSettings": {
+															"type": "AzureBlobFSWriteSettings",
+															"copyBehavior": "PreserveHierarchy"
+														}
+													},
+													"enableStaging": false
+												},
+												"inputs": [
+													{
+														"referenceName": "Data_TEST_PAK_Source_OnPrem",
+														"type": "DatasetReference",
+														"parameters": {
+															"subFolder": "@{pipeline().parameters.subFolder}",
+															"folderPath": "@activity('Get Metadata Folder').output.itemName"
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "Data_TEST_PAK_Sink_Azure",
+														"type": "DatasetReference",
+														"parameters": {
+															"folderPath": {
+																"value": "@activity('Get Metadata Folder').output.itemName",
+																"type": "Expression"
+															},
+															"subFolder": {
+																"value": "@{pipeline().parameters.subFolder}",
+																"type": "Expression"
+															},
+															"year": {
+																"value": "@{formatDateTime(pipeline().TriggerTime, 'yyyy')}",
+																"type": "Expression"
+															},
+															"month": {
+																"value": "@{formatDateTime(pipeline().TriggerTime, 'MM')}",
+																"type": "Expression"
+															},
+															"day": {
+																"value": "@{formatDateTime(pipeline().TriggerTime, 'dd')}",
+																"type": "Expression"
+															},
+															"basePath": {
+																"value": "@{pipeline().parameters.basePath}",
+																"type": "Expression"
+															}
+														}
+													}
+												]
+											},
+											{
+												"name": "Trigger Databricks Job",
+												"type": "ExecutePipeline",
+												"dependsOn": [
+													{
+														"activity": "copy_PAK",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "trigger_test_pak_databricks_workflow",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": false,
+													"parameters": {
+														"environment": {
+															"value": "@{pipeline().parameters.environment}",
+															"type": "Expression"
+														},
+														"folderPath": {
+															"value": "@{pipeline().parameters.subFolder}/@{formatDateTime(pipeline().TriggerTime, 'yyyy')}/@{formatDateTime(pipeline().TriggerTime, 'MM')}/@{formatDateTime(pipeline().TriggerTime, 'dd')}/@{activity('Get Metadata Folder').output.itemName}",
+															"type": "Expression"
+														}
+													}
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"subFolder": {
+						"type": "string",
+						"defaultValue": "Completed"
+					},
+					"basePath": {
+						"type": "string",
+						"defaultValue": "raw"
+					},
+					"environment": {
+						"type": "string",
+						"defaultValue": "test"
+					}
+				},
+				"folder": {
+					"name": "TEST/subpipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Metadata_TEST_PAK_Source_OnPrem_Folder')]",
+				"[concat(variables('factoryId'), '/datasets/Metadata_TEST_PAK_Source_OnPrem')]",
+				"[concat(variables('factoryId'), '/datasets/Data_TEST_PAK_Source_OnPrem')]",
+				"[concat(variables('factoryId'), '/datasets/Data_TEST_PAK_Sink_Azure')]",
+				"[concat(variables('factoryId'), '/pipelines/trigger_test_pak_databricks_workflow')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_TEST_PAK_OnPrem_to_Azure_Completed')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copy_TEST_PAK_OnPrem_to_Azure",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "copy_TEST_PAK_OnPrem_to_Azure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"subFolder": {
+									"value": "@{pipeline().parameters.subFolder}",
+									"type": "Expression"
+								},
+								"basePath": {
+									"value": "@{pipeline().parameters.basePath}",
+									"type": "Expression"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"subFolder": {
+						"type": "string",
+						"defaultValue": "Completed"
+					},
+					"basePath": {
+						"type": "string",
+						"defaultValue": "raw"
+					},
+					"environment": {
+						"type": "string",
+						"defaultValue": "test"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/copy_TEST_PAK_OnPrem_to_Azure')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger_prod_pak_databricks_workflow')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "trigger_prod_pak_databricks_workflow",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/pak/dev_multi_env_at_workbooks/pv_triggering_proxy",
+							"baseParameters": {
+								"idempotency_token": {
+									"value": "@{pipeline().RunId}",
+									"type": "Expression"
+								},
+								"environment": {
+									"value": "@{pipeline().parameters.environment}",
+									"type": "Expression"
+								},
+								"folderpath": {
+									"value": "@{pipeline().parameters.folderPath}",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_pak_dbw_prod",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"environment": {
+						"type": "string"
+					},
+					"folderPath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD/subpipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dbw_prod')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger_test_pak_databricks_workflow')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "trigger_test_pak_databricks_workflow",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Repos/pak/test_multi_env_at_workbooks/pv_triggering_proxy",
+							"baseParameters": {
+								"idempotency_token": {
+									"value": "@{pipeline().RunId}",
+									"type": "Expression"
+								},
+								"folderpath": {
+									"value": "@{pipeline().parameters.folderPath}",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_pak_dbw_prod",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"environment": {
+						"type": "string"
+					},
+					"folderPath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST/subpipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dbw_prod')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_PROD_PAK_Sink_Azure')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_sa_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "string"
+					},
+					"subFolder": {
+						"type": "string"
+					},
+					"year": {
+						"type": "string"
+					},
+					"month": {
+						"type": "string"
+					},
+					"day": {
+						"type": "string"
+					},
+					"basePath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@{dataset().basePath}/@{dataset().subFolder}/@{dataset().year}/@{dataset().month}/@{dataset().day}/@{dataset().folderPath}",
+							"type": "Expression"
+						},
+						"fileSystem": "prod"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_sa_gen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_PROD_PAK_Sink_OnPrem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_prod",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": {
+							"value": "@{dataset().fileName}",
+							"type": "Expression"
+						},
+						"folderPath": "inputStep"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_prod')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_PROD_PAK_Source_Azure')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_sa_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					},
+					"folderPath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@{dataset().fileName}",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@{dataset().folderPath}",
+							"type": "Expression"
+						},
+						"fileSystem": "prod"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_sa_gen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_PROD_PAK_Source_OnPrem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_prod",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "string"
+					},
+					"subFolder": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": {
+							"value": "outputLake/@{dataset().subFolder}/@{dataset().folderPath}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_prod')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_TEST_PAK_Sink_Azure')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_sa_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "string"
+					},
+					"subFolder": {
+						"type": "string"
+					},
+					"year": {
+						"type": "string"
+					},
+					"month": {
+						"type": "string"
+					},
+					"day": {
+						"type": "string"
+					},
+					"basePath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@{dataset().basePath}/@{dataset().subFolder}/@{dataset().year}/@{dataset().month}/@{dataset().day}/@{dataset().folderPath}",
+							"type": "Expression"
+						},
+						"fileSystem": "test"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_sa_gen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_TEST_PAK_Sink_OnPrem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_test",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": {
+							"value": "@{dataset().fileName}",
+							"type": "Expression"
+						},
+						"folderPath": "inputStep"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_test')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_TEST_PAK_Source_Azure')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_sa_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					},
+					"folderPath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@{dataset().fileName}",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@{dataset().folderPath}",
+							"type": "Expression"
+						},
+						"fileSystem": "test"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_sa_gen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Data_TEST_PAK_Source_OnPrem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_test",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"subFolder": {
+						"type": "string"
+					},
+					"folderPath": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": {
+							"value": "outputLake/@{dataset().subFolder}/@{dataset().folderPath}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_test')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Metadata_PROD_PAK_Source_OnPrem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_prod",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "string"
+					},
+					"subFolder": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": {
+							"value": "outputLake/@{dataset().subFolder}/@{dataset().folderPath}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_prod')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Metadata_PROD_PAK_Source_OnPrem_Folder')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_prod",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"subFolder": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PROD"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": {
+							"value": "outputLake/@{dataset().subFolder}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_prod')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Metadata_TEST_PAK_Source_OnPrem')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_test",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"folderPath": {
+						"type": "string"
+					},
+					"subFolder": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": {
+							"value": "outputLake/@{dataset().subFolder}/@{dataset().folderPath}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_test')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Metadata_TEST_PAK_Source_OnPrem_Folder')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_pak_dfs_test",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"subFolder": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"folderPath": {
+							"value": "outputLake/@{dataset().subFolder}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_pak_dfs_test')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/kvdataplatform')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('kvdataplatform_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_pak_dbw_prod')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-843571675270107.7.azuredatabricks.net",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/50888be5-ad58-4821-afeb-b8114fdb5353/resourceGroups/rg-pak-prod-westeurope/providers/Microsoft.Databricks/workspaces/dbs-pak-prod-westeurope",
+					"newClusterNodeType": "Standard_DS3_v2",
+					"newClusterNumOfWorker": "1",
+					"newClusterSparkEnvVars": {
+						"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+					},
+					"newClusterVersion": "11.3.x-scala2.12",
+					"clusterOption": "Fixed",
+					"newClusterInitScripts": []
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_pak_dfs_prod')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('ls_pak_dfs_prod_properties_typeProperties_host')]",
+					"userId": "[parameters('ls_pak_dfs_prod_properties_typeProperties_userId')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "kvdataplatform",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "OnPremDataPlatformIntegration"
+					}
+				},
+				"connectVia": {
+					"referenceName": "SHIR-DLIR901-LINKED",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/SHIR-DLIR901-LINKED')]",
+				"[concat(variables('factoryId'), '/linkedServices/kvdataplatform')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_pak_dfs_test')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('ls_pak_dfs_test_properties_typeProperties_host')]",
+					"userId": "[parameters('ls_pak_dfs_test_properties_typeProperties_userId')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "kvdataplatform",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "OnPremDataPlatformIntegration"
+					}
+				},
+				"connectVia": {
+					"referenceName": "SHIR-DLIR901-LINKED",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/SHIR-DLIR901-LINKED')]",
+				"[concat(variables('factoryId'), '/linkedServices/kvdataplatform')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_pak_sa_gen2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ls_pak_sa_gen2_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "kvdataplatform",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "sapakprodwesteurope"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/kvdataplatform')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_TEST_PAK_Azure_to_onPrem')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "copy_TEST_PAK_Azure_to_onPrem",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"fileName": "[parameters('copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_fileName')]",
+							"folderPath": "[parameters('copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_folderPath')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/test/blobs/released/",
+					"blobPathEndsWith": ".json",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('copy_TEST_PAK_Azure_to_onPrem_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/copy_TEST_PAK_Azure_to_onPrem')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SHIR-DLIR901-LINKED')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {
+					"linkedInfo": {
+						"resourceId": "[parameters('SHIR-DLIR901-LINKED_properties_typeProperties_linkedInfo_resourceId')]",
+						"authorizationType": "Rbac"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
