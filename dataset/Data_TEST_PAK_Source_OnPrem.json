@@ -6,12 +6,15 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"folderPath": {
-				"type": "string"
-			},
 			"subFolder": {
 				"type": "string"
+			},
+			"folderPath": {
+				"type": "string"
 			}
+		},
+		"folder": {
+			"name": "TEST"
 		},
 		"annotations": [],
 		"type": "Binary",

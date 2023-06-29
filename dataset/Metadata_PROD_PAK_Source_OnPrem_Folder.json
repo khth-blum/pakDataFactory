@@ -1,28 +1,27 @@
 {
-	"name": "Data_TEST_PAK_Sink_OnPrem",
+	"name": "Metadata_PROD_PAK_Source_OnPrem_Folder",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "ls_pak_dfs_test",
+			"referenceName": "ls_pak_dfs_prod",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"fileName": {
+			"subFolder": {
 				"type": "string"
 			}
 		},
 		"folder": {
-			"name": "TEST"
+			"name": "PROD"
 		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
 				"type": "FileServerLocation",
-				"fileName": {
-					"value": "@{dataset().fileName}",
+				"folderPath": {
+					"value": "outputLake/@{dataset().subFolder}",
 					"type": "Expression"
-				},
-				"folderPath": "inputStep"
+				}
 			}
 		}
 	}

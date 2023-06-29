@@ -1,28 +1,32 @@
 {
-	"name": "Data_TEST_PAK_Sink_OnPrem",
+	"name": "Data_PROD_PAK_Source_Azure",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "ls_pak_dfs_test",
+			"referenceName": "ls_pak_sa_gen2",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
 			"fileName": {
 				"type": "string"
+			},
+			"folderPath": {
+				"type": "string"
 			}
 		},
 		"folder": {
-			"name": "TEST"
+			"name": "PROD"
 		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
-				"type": "FileServerLocation",
+				"type": "AzureBlobFSLocation",
 				"fileName": {
 					"value": "@{dataset().fileName}",
 					"type": "Expression"
 				},
-				"folderPath": "inputStep"
+				"folderPath": "@{dataset().folderPath}",
+				"fileSystem": "prod"
 			}
 		}
 	}

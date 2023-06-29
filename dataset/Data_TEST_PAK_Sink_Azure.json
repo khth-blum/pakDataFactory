@@ -1,5 +1,5 @@
 {
-	"name": "Data_PROD_PAK_Sink_Azure",
+	"name": "Data_TEST_PAK_Sink_Azure",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_pak_sa_gen2",
@@ -26,7 +26,7 @@
 			}
 		},
 		"folder": {
-			"name": "PROD"
+			"name": "TEST"
 		},
 		"annotations": [],
 		"type": "Binary",
@@ -37,7 +37,7 @@
 					"value": "@{dataset().basePath}/@{dataset().subFolder}/@{dataset().year}/@{dataset().month}/@{dataset().day}/@{dataset().folderPath}",
 					"type": "Expression"
 				},
-				"fileSystem": "prod"
+				"fileSystem": "test"
 			}
 		}
 	}
