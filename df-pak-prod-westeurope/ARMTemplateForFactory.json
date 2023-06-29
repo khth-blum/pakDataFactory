@@ -1377,8 +1377,7 @@
 						"folderPath": {
 							"value": "@{dataset().folderPath}",
 							"type": "Expression"
-						},
-						"fileSystem": "test"
+						}
 					}
 				}
 			},
