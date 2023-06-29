@@ -969,6 +969,36 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/copy_TEST_PAK_Azure_to_onPrem')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_TEST_PAK_onPrem_to_Azure')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "copy_TEST_PAK_OnPrem_to_Azure_Completed",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 15,
+						"startTime": "2023-06-29T10:00:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/copy_TEST_PAK_OnPrem_to_Azure_Completed')]"
+			]
 		}
 	]
 }
