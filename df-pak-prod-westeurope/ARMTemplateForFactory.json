@@ -886,6 +886,48 @@
 														}
 													}
 												}
+											},
+											{
+												"name": "Delete Folder",
+												"type": "Delete",
+												"dependsOn": [
+													{
+														"activity": "copy_PAK",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"dataset": {
+														"referenceName": "Data_TEST_PAK_Source_OnPrem",
+														"type": "DatasetReference",
+														"parameters": {
+															"subFolder": {
+																"value": "@activity('Get Metadata Folder').output.itemName",
+																"type": "Expression"
+															},
+															"folderPath": {
+																"value": "@{pipeline().parameters.subFolder}",
+																"type": "Expression"
+															}
+														}
+													},
+													"enableLogging": false,
+													"storeSettings": {
+														"type": "FileServerReadSettings",
+														"recursive": true,
+														"enablePartitionDiscovery": false
+													}
+												}
 											}
 										]
 									}
@@ -1711,21 +1753,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SHIR-DLIR901-LINKED')]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "SelfHosted",
-				"typeProperties": {
-					"linkedInfo": {
-						"resourceId": "[parameters('SHIR-DLIR901-LINKED_properties_typeProperties_linkedInfo_resourceId')]",
-						"authorizationType": "Rbac"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/copy_TEST_PAK_onPrem_to_Azure')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -1754,6 +1781,21 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/copy_TEST_PAK_OnPrem_to_Azure_Completed')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SHIR-DLIR901-LINKED')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {
+					"linkedInfo": {
+						"resourceId": "[parameters('SHIR-DLIR901-LINKED_properties_typeProperties_linkedInfo_resourceId')]",
+						"authorizationType": "Rbac"
+					}
+				}
+			},
+			"dependsOn": []
 		}
 	]
 }
