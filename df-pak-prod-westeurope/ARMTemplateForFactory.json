@@ -912,11 +912,11 @@
 														"type": "DatasetReference",
 														"parameters": {
 															"subFolder": {
-																"value": "@activity('Get Metadata Folder').output.itemName",
+																"value": "@{pipeline().parameters.subFolder}",
 																"type": "Expression"
 															},
 															"folderPath": {
-																"value": "@{pipeline().parameters.subFolder}",
+																"value": "@activity('Get Metadata Folder').output.itemName",
 																"type": "Expression"
 															}
 														}
