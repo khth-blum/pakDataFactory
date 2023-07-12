@@ -21,10 +21,6 @@
 						"basePath": {
 							"value": "@{pipeline().parameters.basePath}",
 							"type": "Expression"
-						},
-						"environment": {
-							"value": "@{pipeline().parameters.environment}",
-							"type": "Expression"
 						}
 					}
 				}
