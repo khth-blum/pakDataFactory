@@ -35,6 +35,15 @@
 		"SHIR-DLIR901-LINKED_properties_typeProperties_linkedInfo_resourceId": {
 			"value": "/subscriptions/3cd239b3-3363-4e70-add4-e14dab142dca/resourcegroups/PoCDataLake/providers/Microsoft.DataFactory/factories/PoCDLDF/integrationruntimes/dlir901"
 		},
+		"copy_PROD_PAK_Azure_to_onPrem_properties_copy_PROD_PAK_Azure_to_onPrem_parameters_fileName": {
+			"value": "@triggerBody().fileName"
+		},
+		"copy_PROD_PAK_Azure_to_onPrem_properties_copy_PROD_PAK_Azure_to_onPrem_parameters_folderPath": {
+			"value": "@triggerBody().folderPath"
+		},
+		"copy_PROD_PAK_Azure_to_onPrem_properties_typeProperties_scope": {
+			"value": "/subscriptions/50888be5-ad58-4821-afeb-b8114fdb5353/resourceGroups/rg-pak-prod-westeurope/providers/Microsoft.Storage/storageAccounts/sapakprodwesteurope"
+		},
 		"containerUri": {
 			"value": ""
 		},
