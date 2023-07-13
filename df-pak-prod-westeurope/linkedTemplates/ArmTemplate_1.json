@@ -7,18 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "df-pak-prod-westeurope"
 		},
-		"copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_fileName": {
-			"type": "string",
-			"defaultValue": "@triggerBody().fileName"
-		},
-		"copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_folderPath": {
-			"type": "string",
-			"defaultValue": "@triggerBody().folderPath"
-		},
-		"copy_TEST_PAK_Azure_to_onPrem_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/50888be5-ad58-4821-afeb-b8114fdb5353/resourceGroups/rg-pak-prod-westeurope/providers/Microsoft.Storage/storageAccounts/sapakprodwesteurope"
-		},
 		"copy_PROD_PAK_Azure_to_onPrem_properties_copy_PROD_PAK_Azure_to_onPrem_parameters_fileName": {
 			"type": "string",
 			"defaultValue": "@triggerBody().fileName"
@@ -28,6 +16,18 @@
 			"defaultValue": "@triggerBody().folderPath"
 		},
 		"copy_PROD_PAK_Azure_to_onPrem_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/50888be5-ad58-4821-afeb-b8114fdb5353/resourceGroups/rg-pak-prod-westeurope/providers/Microsoft.Storage/storageAccounts/sapakprodwesteurope"
+		},
+		"copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_fileName": {
+			"type": "string",
+			"defaultValue": "@triggerBody().fileName"
+		},
+		"copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_folderPath": {
+			"type": "string",
+			"defaultValue": "@triggerBody().folderPath"
+		},
+		"copy_TEST_PAK_Azure_to_onPrem_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/50888be5-ad58-4821-afeb-b8114fdb5353/resourceGroups/rg-pak-prod-westeurope/providers/Microsoft.Storage/storageAccounts/sapakprodwesteurope"
 		}
@@ -987,40 +987,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/copy_TEST_PAK_Azure_to_onPrem')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "copy_TEST_PAK_Azure_to_onPrem",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"fileName": "[parameters('copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_fileName')]",
-							"folderPath": "[parameters('copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_folderPath')]"
-						}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/test/blobs/released/",
-					"blobPathEndsWith": ".json",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('copy_TEST_PAK_Azure_to_onPrem_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/copy_TEST_PAK_Azure_to_onPrem')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/copy_PROD_PAK_Azure_to_onPrem')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -1052,6 +1018,40 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/copy_PROD_PAK_Azure_to_onPrem')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_TEST_PAK_Azure_to_onPrem')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "copy_TEST_PAK_Azure_to_onPrem",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"fileName": "[parameters('copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_fileName')]",
+							"folderPath": "[parameters('copy_TEST_PAK_Azure_to_onPrem_properties_copy_TEST_PAK_Azure_to_onPrem_parameters_folderPath')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/test/blobs/released/",
+					"blobPathEndsWith": ".json",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('copy_TEST_PAK_Azure_to_onPrem_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/copy_TEST_PAK_Azure_to_onPrem')]"
 			]
 		},
 		{
