@@ -1,0 +1,24 @@
+{
+	"name": "copy_PROD_PAK_onPrem_to_Azure_Completed",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "copy_PROD_PAK_OnPrem_to_Azure_Completed",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 15,
+				"startTime": "2023-07-14T09:15:00Z",
+				"timeZone": "UTC"
+			}
+		}
+	}
+}
