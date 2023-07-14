@@ -3,13 +3,20 @@
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
-		"pipelines": [],
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "copy_PROD_PAK_OnPrem_to_Azure_Cancelled",
+					"type": "PipelineReference"
+				}
+			}
+		],
 		"type": "ScheduleTrigger",
 		"typeProperties": {
 			"recurrence": {
 				"frequency": "Minute",
 				"interval": 15,
-				"startTime": "2023-07-14T09:00:00Z",
+				"startTime": "2023-07-14T09:15:00Z",
 				"timeZone": "UTC"
 			}
 		}
