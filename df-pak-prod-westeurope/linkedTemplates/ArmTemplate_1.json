@@ -104,8 +104,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"fileName": {
@@ -357,6 +356,9 @@
 														]
 													}
 												],
+												"policy": {
+													"secureInput": false
+												},
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
@@ -426,8 +428,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"subFolder": {
@@ -517,8 +518,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"fileName": {
@@ -764,6 +764,9 @@
 														]
 													}
 												],
+												"policy": {
+													"secureInput": false
+												},
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
@@ -833,8 +836,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"subFolder": {
@@ -867,6 +869,9 @@
 						"name": "copy_PROD_PAK_OnPrem_to_Azure",
 						"type": "ExecutePipeline",
 						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
@@ -888,8 +893,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"subFolder": {
@@ -924,6 +928,9 @@
 						"name": "copy_PROD_PAK_OnPrem_to_Azure",
 						"type": "ExecutePipeline",
 						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
@@ -945,8 +952,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"subFolder": {
@@ -981,6 +987,9 @@
 						"name": "copy_TEST_PAK_OnPrem_to_Azure",
 						"type": "ExecutePipeline",
 						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
@@ -1002,8 +1011,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"subFolder": {
@@ -1097,36 +1105,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/copy_TEST_PAK_onPrem_to_Azure')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "copy_TEST_PAK_OnPrem_to_Azure_Completed",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Minute",
-						"interval": 15,
-						"startTime": "2023-06-29T10:00:00Z",
-						"timeZone": "UTC"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/copy_TEST_PAK_OnPrem_to_Azure_Completed')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/copy_PROD_PAK_onPrem_to_Azure_Cancelled')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -1184,6 +1162,36 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/copy_PROD_PAK_OnPrem_to_Azure_Completed')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_TEST_PAK_onPrem_to_Azure')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "copy_TEST_PAK_OnPrem_to_Azure_Completed",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 15,
+						"startTime": "2023-06-29T10:00:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/copy_TEST_PAK_OnPrem_to_Azure_Completed')]"
 			]
 		}
 	]

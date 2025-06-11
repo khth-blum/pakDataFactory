@@ -132,8 +132,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"fileName": {
@@ -388,6 +387,9 @@
 														]
 													}
 												],
+												"policy": {
+													"secureInput": false
+												},
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
@@ -457,8 +459,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"subFolder": {
@@ -496,6 +497,9 @@
 						"name": "copy_PROD_PAK_OnPrem_to_Azure",
 						"type": "ExecutePipeline",
 						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
@@ -517,8 +521,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"subFolder": {
@@ -553,6 +556,9 @@
 						"name": "copy_PROD_PAK_OnPrem_to_Azure",
 						"type": "ExecutePipeline",
 						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
@@ -574,8 +580,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"subFolder": {
@@ -668,8 +673,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"fileName": {
@@ -918,6 +922,9 @@
 														]
 													}
 												],
+												"policy": {
+													"secureInput": false
+												},
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
@@ -987,8 +994,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"subFolder": {
@@ -1027,6 +1033,9 @@
 						"name": "copy_TEST_PAK_OnPrem_to_Azure",
 						"type": "ExecutePipeline",
 						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
@@ -1048,8 +1057,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"subFolder": {
@@ -1112,8 +1120,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"environment": {
@@ -1170,8 +1177,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"environment": {
@@ -1675,7 +1681,7 @@
 					"newClusterSparkEnvVars": {
 						"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
 					},
-					"newClusterVersion": "11.3.x-scala2.12",
+					"newClusterVersion": "13.3.x-scala2.12",
 					"clusterOption": "Fixed",
 					"newClusterInitScripts": []
 				}
@@ -1798,6 +1804,66 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/copy_PROD_PAK_onPrem_to_Azure_Cancelled')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "copy_PROD_PAK_OnPrem_to_Azure_Cancelled",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 15,
+						"startTime": "2023-07-14T09:15:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/copy_PROD_PAK_OnPrem_to_Azure_Cancelled')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_PROD_PAK_onPrem_to_Azure_Completed')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "copy_PROD_PAK_OnPrem_to_Azure_Completed",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 15,
+						"startTime": "2023-07-14T09:15:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/copy_PROD_PAK_OnPrem_to_Azure_Completed')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/copy_TEST_PAK_Azure_to_onPrem')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -1875,66 +1941,6 @@
 				}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/copy_PROD_PAK_onPrem_to_Azure_Cancelled')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "copy_PROD_PAK_OnPrem_to_Azure_Cancelled",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Minute",
-						"interval": 15,
-						"startTime": "2023-07-14T09:15:00Z",
-						"timeZone": "UTC"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/copy_PROD_PAK_OnPrem_to_Azure_Cancelled')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/copy_PROD_PAK_onPrem_to_Azure_Completed')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "copy_PROD_PAK_OnPrem_to_Azure_Completed",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Minute",
-						"interval": 15,
-						"startTime": "2023-07-14T09:15:00Z",
-						"timeZone": "UTC"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/copy_PROD_PAK_OnPrem_to_Azure_Completed')]"
-			]
 		}
 	]
 }

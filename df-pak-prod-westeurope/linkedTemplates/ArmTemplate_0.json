@@ -69,7 +69,7 @@
 					"newClusterSparkEnvVars": {
 						"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
 					},
-					"newClusterVersion": "11.3.x-scala2.12",
+					"newClusterVersion": "13.3.x-scala2.12",
 					"clusterOption": "Fixed",
 					"newClusterInitScripts": []
 				}
@@ -129,8 +129,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"environment": {
@@ -187,8 +186,7 @@
 					}
 				],
 				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
+					"elapsedTimeMetric": {}
 				},
 				"parameters": {
 					"environment": {
