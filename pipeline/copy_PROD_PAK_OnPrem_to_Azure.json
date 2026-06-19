@@ -304,8 +304,7 @@
 		],
 		"parameters": {
 			"subFolder": {
-				"type": "string",
-				"defaultValue": "Cancelled"
+				"type": "string"
 			},
 			"basePath": {
 				"type": "string",
