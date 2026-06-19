@@ -231,6 +231,9 @@
 												]
 											}
 										],
+										"policy": {
+											"secureInput": false
+										},
 										"userProperties": [],
 										"typeProperties": {
 											"pipeline": {
@@ -301,7 +304,8 @@
 		],
 		"parameters": {
 			"subFolder": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "Cancelled"
 			},
 			"basePath": {
 				"type": "string",
